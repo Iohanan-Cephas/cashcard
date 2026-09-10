@@ -11,13 +11,13 @@ import org.springframework.boot.test.json.JacksonTester;
 
 import example.cashcard.models.CashCard;
 
-@JsonTest 
+@JsonTest
 public class CashCardJsonTest {
 
     @Autowired
     private JacksonTester<CashCard> json;
 
-    @Test 
+    @Test
     void cashCardSerializationTest() throws IOException {
 
         CashCard cashCard = new CashCard(99L, 123.45);
@@ -27,6 +27,22 @@ public class CashCardJsonTest {
         assertThat(json.write(cashCard)).hasJsonPathNumberValue("@.amount");
         assertThat(json.write(cashCard)).extractingJsonPathNumberValue("@.amount").isEqualTo(123.45);
 
+    }
+
+    @Test
+    void cashCardDeserializationTest() throws IOException {
+
+        String expected = """
+                {
+                    "id":99,
+                    "amount":123.45
+                }
+                """;
+
+        assertThat(json.parse(expected)).isEqualTo(new CashCard(99L, 123.45));
+        assertThat(json.parseObject(expected).id()).isEqualTo(99);
+        assertThat(json.parseObject(expected).amount()).isEqualTo(123.45);
+        
     }
 
 }
