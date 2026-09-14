@@ -23,7 +23,7 @@ public class CashCardApplicationTests {
 	@Test
 	void shouldReturnACashCardWhenDataIsSaved() {
 
-		//aqui utilizamos o restTemplate para fazer uma requisião HTTP GET para nosso aplicação no endpoint /cashcards/99
+		//aqui utilizamos o restTemplate para fazer uma requisião HTTP GET para nossa aplicação no endpoint /cashcards/99
 		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards/99", String.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
