@@ -11,14 +11,18 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRe
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import example.cashcard.models.CashCard;
+import net.minidev.json.JSONArray;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate 
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class CashCardApplicationTests {
 
 	@Autowired 
@@ -50,6 +54,7 @@ public class CashCardApplicationTests {
 	}
 
 	@Test 
+	@DirtiesContext 
 	void shouldCreateANewCashCard() {
 		
 		CashCard newCashCard = new CashCard(null, 250D);
@@ -66,6 +71,24 @@ public class CashCardApplicationTests {
 		Double amount = documentContext.read("@.amount");
 		assertThat(id).isNotNull();
 		assertThat(amount).isEqualTo(250.00);
+
+	}
+
+	@Test 
+	void shouldReturnAllCashCardsWhenListIsRequested() {
+		
+		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards", String.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody());
+		int cashCardCount = documentContext.read("$.length()");
+		assertThat(cashCardCount).isEqualTo(3);
+
+		JSONArray ids = documentContext.read("$..id");
+		assertThat(ids).containsExactlyInAnyOrder(99, 100, 101);
+
+		JSONArray amounts = documentContext.read("$..amount");
+		assertThat(amounts).containsExactlyInAnyOrder(123.45, 1.00, 150.00);
 
 	}
 
