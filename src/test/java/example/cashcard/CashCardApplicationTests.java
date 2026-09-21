@@ -22,7 +22,7 @@ import net.minidev.json.JSONArray;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate 
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+// @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class CashCardApplicationTests {
 
 	@Autowired 
@@ -36,10 +36,10 @@ public class CashCardApplicationTests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
-		Number id = documentContext.read("@.id");
+		Number id = documentContext.read("$.id");
 		assertThat(id).isEqualTo(99);
 
-		Double amount = documentContext.read("@.amount");
+		Double amount = documentContext.read("$.amount");
 		assertThat(amount).isEqualTo(123.45);
 
 	}
@@ -67,8 +67,8 @@ public class CashCardApplicationTests {
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
-		Number id = documentContext.read("@.id");
-		Double amount = documentContext.read("@.amount");
+		Number id = documentContext.read("$.id");
+		Double amount = documentContext.read("$.amount");
 		assertThat(id).isNotNull();
 		assertThat(amount).isEqualTo(250.00);
 
@@ -90,6 +90,18 @@ public class CashCardApplicationTests {
 		JSONArray amounts = documentContext.read("$..amount");
 		assertThat(amounts).containsExactlyInAnyOrder(123.45, 1.00, 150.00);
 
+	}
+
+	@Test 
+	void shouldReturnAPageOfCashCards() {
+
+		ResponseEntity<String> response = restTemplate.getForEntity("/cashcards?page=0&size=1", String.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody());
+		JSONArray page = documentContext.read("$[*]");
+		assertThat(page.size()).isEqualTo(1);
+		
 	}
 
 }
