@@ -224,6 +224,15 @@ public class CashCardApplicationTests {
 		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("sarah1", "abc123")
 		.getForEntity("/cashcards/99", String.class);
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+	}
+
+	@Test 
+	void shouldNotDeleteACashCardThatDoesNotExist() {
+
+		ResponseEntity<Void> response = restTemplate.withBasicAuth("sarah1", "abc123")
+		.exchange("/cashcards/999", HttpMethod.DELETE, null, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		
 	}
 
