@@ -233,7 +233,20 @@ public class CashCardApplicationTests {
 		ResponseEntity<Void> response = restTemplate.withBasicAuth("sarah1", "abc123")
 		.exchange("/cashcards/999", HttpMethod.DELETE, null, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-		
+
+	}
+
+	@Test 
+	void shouldNotDeleteACashCardThatIsOwnedBySomeoneElse() {
+
+		ResponseEntity<Void> response = restTemplate.withBasicAuth("sarah1", "abc123")
+		.exchange("/cashcards/102", HttpMethod.DELETE, null, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("kumar2", "ghi789")
+		.getForEntity("/cashcards/102", String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 	}
 
 }

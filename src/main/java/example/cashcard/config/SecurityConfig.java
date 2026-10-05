@@ -46,7 +46,7 @@ public class SecurityConfig {
 
         UserDetails kumar2 = users
         .username("kumar2")
-        .password(passwordEncoder.encode("xyz789"))
+        .password(passwordEncoder.encode("ghi789"))
         .roles("CARD-OWNER")
         .build();
 
